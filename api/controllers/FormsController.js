@@ -32,7 +32,7 @@ module.exports = {
         `;
 
         response.statusCode = 200;
-        response.json({});
+        response.xml(xml_template);
     }
 };
 
