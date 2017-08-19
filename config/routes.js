@@ -36,7 +36,9 @@ module.exports.routes = {
     view: 'homepage'
   },
 
-  'post /formUpload': 'FormsController.formPost',
+  'post /submission': 'FormsController.formPost',
+  'get /formList': 'FormsController.getFormList',
+  // 'post /submission': 'FormsController.formPost',
 
   /***************************************************************************
   *                                                                          *
