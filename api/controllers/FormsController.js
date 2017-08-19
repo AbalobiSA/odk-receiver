@@ -25,6 +25,12 @@ module.exports = {
         console.log("HEADERS:", request.headers);
         console.log("BODY:", request.body);
 
+        let xml_template = `
+            <forms>
+            <form url="https://abalobi-fisher.appspot.com/formXml?formId=Fisher_Logbook_v2_0">Fisher_Logbook_v2_0</form>
+            </forms>
+        `;
+
         response.statusCode = 200;
         response.json({});
     }
