@@ -11,6 +11,9 @@ module.exports = {
         console.log("Received POST for submission");
         console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
 
+        console.log("HEADERS:", request.headers);
+        console.log("BODY:", request.body);
+
         response.statusCode = 200;
         response.json({});
     },
@@ -18,6 +21,9 @@ module.exports = {
     getFormList: (request, response) => {
         console.log("Received GET for formList");
         console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+
+        console.log("HEADERS:", request.headers);
+        console.log("BODY:", request.body);
 
         response.statusCode = 200;
         response.json({});
