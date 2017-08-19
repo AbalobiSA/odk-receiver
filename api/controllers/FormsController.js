@@ -32,7 +32,8 @@ module.exports = {
         `;
 
         response.statusCode = 200;
-        response.xml(xml_template);
+        response.headers['content-type'] = "text/xml";
+        response.send(xml_template);
     }
 };
 
