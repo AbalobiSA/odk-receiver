@@ -30,23 +30,23 @@ module.exports.http = {
   *                                                                          *
   ***************************************************************************/
 
-    // order: [
-    //   'startRequestTimer',
-    //   'cookieParser',
-    //   'session',
-    //   'myRequestLogger',
-    //   'bodyParser',
-    //   'handleBodyParserError',
-    //   'compress',
-    //   'methodOverride',
-    //   'poweredBy',
-    //   '$custom',
-    //   'router',
-    //   'www',
-    //   'favicon',
-    //   '404',
-    //   '500'
-    // ],
+    order: [
+      'startRequestTimer',
+      'cookieParser',
+      'session',
+      'myRequestLogger',
+      'bodyParser',
+      'handleBodyParserError',
+      'compress',
+      'methodOverride',
+      'poweredBy',
+      '$custom',
+      'router',
+      'www',
+      'favicon',
+      '404',
+      '500'
+    ],
 
   /****************************************************************************
   *                                                                           *
@@ -54,10 +54,10 @@ module.exports.http = {
   *                                                                           *
   ****************************************************************************/
 
-    // myRequestLogger: function (req, res, next) {
-    //     console.log("Requested :: ", req.method, req.url);
-    //     return next();
-    // }
+    myRequestLogger: function (req, res, next) {
+        console.log("Requested :: ", req.method, req.url);
+        return next();
+    },
 
 
   /***************************************************************************
@@ -75,7 +75,69 @@ module.exports.http = {
   *                                                                          *
   ***************************************************************************/
 
-    // bodyParser: require('skipper')({strict: true})
+  bodyParser: (function() {
+      // Initialize a skipper instance with the default options
+      let skipper = require('skipper')({
+          strict: true,
+          limit: '50mb'
+      });
+      // Initialize an express-xml-bodyparser instance with the default options
+      let xmlparser = require('express-xml-bodyparser')();
+      // Create and return the middleware function
+      let util = require("util");
+      let fs = require("fs");
+      let multer = require('multer');
+      let upload = multer().array();
+
+      let SalesforceHeader = "text/xml; charset=utf-8";
+
+      return function (req, res, next) {
+          // If we see an application/xml header, parse the body as XML
+          console.log("CONTENT TYPE: " + req.headers['content-type']);
+
+          if (req.headers['content-type'] === 'application/xml'
+              || req.headers['content-type'] === 'text/xml'
+              // || req.headers['content-type'] !== undefined
+              // && req.headers['content-type'].includes("multipart/form-data")
+              || req.headers['content-type'] === 'application/x-www-form-urlencoded'
+              || req.headers['content-type'] === SalesforceHeader) {
+              console.log("XML DETECTED");
+              return xmlparser(req, res, next);
+          }
+
+          else if (req.headers['content-type'] !== undefined
+              && req.headers['content-type'].includes("multipart/form-data")) {
+                console.log("FORM MULTIPART DATA DETECTED");
+                // console.log(util.inspect(res));
+                // fs.writeFile("datafiles/request.json", util.inspect(res), (err, success) => console.log("Done!"));
+
+                // return upload(req, res, (err) => {
+                //     if (err) {
+                //         console.log(err);
+                //     }
+                //     next();
+                // });
+
+              return skipper(req, res, () => {
+                  req.file().upload({
+
+                  }, (err, uploadedFiles) => {
+                      if (err) {
+                          console.log("Error!:", err);
+                          next();
+                      } else {
+                          console.log(`${uploadedFiles.length} uploaded successfully!`)
+                          console.log(uploadedFiles)
+                      }
+                  });
+              })
+          }
+          // Otherwise use Skipper to parse the body
+          console.log("JSON DETECTED!");
+          return skipper(req, res, next);
+      };
+
+  })()
 
   },
 
